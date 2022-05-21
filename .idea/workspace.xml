@@ -2,12 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3976786f-72ca-4fe4-b77e-ec3be0fe9327" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/FastAPI-Auth.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Webshop.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fastapi/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/FastAPI-Auth.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/FastAPI-Auth.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/fastapi/app/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/crud.py" beforeDir="false" afterPath="$PROJECT_DIR$/fastapi/app/crud.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/fastapi/app/database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/fastapi/app/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/fastapi/app/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models_and_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/fastapi/app/models_and_schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/fastapi/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/fastapi/app/schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/sendmail.py" beforeDir="false" afterPath="$PROJECT_DIR$/fastapi/app/sendmail.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,6 +39,12 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\User\Desktop\fastapiauth\FastAPI-Auth\fastapi" />
+      <recent name="C:\Users\User\Desktop\fastapiauth\FastAPI-Auth" />
+    </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">

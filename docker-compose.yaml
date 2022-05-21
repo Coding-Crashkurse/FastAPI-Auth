@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  database:
+    image: postgres:14.1-alpine
+    expose:
+      - "5432"
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  fastapi:
+    build: ./fastapi
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql://test:test@database/db
+      - EMAIL=test
+      - PASSWORD=test
+    depends_on:
+      - database
+    restart: always
+
+volumes:
+  postgres_data:
