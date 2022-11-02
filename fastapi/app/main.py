@@ -2,7 +2,7 @@ from dotenv import find_dotenv, load_dotenv
 
 load_dotenv(find_dotenv())
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -10,16 +10,16 @@ from sqlalchemy.orm import Session
 from . import auth, crud, models, schemas, sendmail
 from .database import engine, get_db
 
-models.Base.metadata.create_all(bind=engine)
+# models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 
 @app.post("/register")
-def register_user(user: schemas.UserSchema, db: Session = Depends(get_db)):
-    # db_user = crud.get_users_by_username(db=db, username=user.username)
-    # if db_user:
-    #     raise HTTPException(status_code=400, detail="Email existiert bereits im System")
+def register_user(user: schemas.UserRegister, db: Session = Depends(get_db)):
+    db_user = crud.get_users_by_username(db=db, username=user.username)
+    if db_user:
+        raise HTTPException(status_code=400, detail="Email existiert bereits im System")
     db_user = crud.create_user(db=db, user=user)
     token = auth.create_access_token(db_user)
     sendmail.send_mail(to=db_user.email, token=token, username=db_user.username)
