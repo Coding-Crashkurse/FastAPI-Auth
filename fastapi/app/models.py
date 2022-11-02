@@ -7,9 +7,9 @@ from .schemas import Roles
 class UserModel(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=False, index=True)
-    username = Column(String, unique=True)
-    hashed_password = Column(String)
+    id = Column(String, primary_key=True, index=True, nullable=False)
+    email = Column(String, unique=True, index=True, nullable=False)
+    username = Column(String, unique=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=False)
-    role = Column(Enum(Roles), default="user")
+    role = Column(Enum(Roles))

@@ -8,12 +8,18 @@ class Roles(Enum):
     admin = "admin"
 
 
-class UserSchema(BaseModel):
+class UserBase(BaseModel):
     email: EmailStr
     username: str
-    password: str
     is_active: bool = False
     role: Roles = "user"
 
+class UserRegister(UserBase):
+    password: str
+
+class UserDB(UserBase):
+    id: str
+    hashed_password: str
+    
     class Config:
         orm_mode = True

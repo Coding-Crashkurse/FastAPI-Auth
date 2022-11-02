@@ -72,7 +72,7 @@ def send_mail(to, token, username, email=email, password=password):
     msg["To"] = to
 
     # Send the message via our own SMTP server.
-    server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+    server = smtplib.SMTP("smtp.mailgun.org", 587)
     server.login(email, password)
     server.send_message(msg)
     server.quit()
