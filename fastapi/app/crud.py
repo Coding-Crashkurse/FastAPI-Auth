@@ -30,6 +30,6 @@ def get_users(db: Session):
     users: List[schemas.UserDB] = db.query(models.UserModel).all()
     return users
 
-def get_users_by_username(db: Session, username: str):
+def get_user_by_username(db: Session, username: str):
     user: schemas.UserDB = db.query(models.UserModel).filter(models.UserModel.username == username).first()
     return user
