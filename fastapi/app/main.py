@@ -1,36 +1,24 @@
 from dotenv import find_dotenv, load_dotenv
-from datetime import timedelta
 load_dotenv(find_dotenv())
 
+from datetime import datetime, timedelta
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 import os
 
-from fastapi_login import LoginManager
-
 from . import auth, crud, models, schemas, sendmail
 from .database import engine, get_db, DBContext
 
-# models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 # app.mount("/static", StaticFiles(directory="static"), name="static")
 
-SECRET_KEY = os.getenv('SECRET_KEY')
-ACCESS_TOKEN_EXPIRE_MINUTES=60
 
-# manager = LoginManager(SECRET_KEY, token_url="/login", use_cookie=True, use_header=False)
-# manager.cookie_name = "auth"
-
-
-# @manager.user_loader()
-# def get_user(username: str, db: Session = None):
-#     if db is None:
-#         with DBContext() as db:
-#             return crud.get_user_by_username(db=db,username=username)    
-#     return crud.get_user_by_username(db=db, username=username)
+@app.get('/', response_class=RedirectResponse, include_in_schema=False)
+def docs():
+    return RedirectResponse(url='/docs')
 
 
 @app.post("/register")
@@ -44,9 +32,9 @@ def register_user(user: schemas.UserRegister, db: Session = Depends(get_db)):
     return db_user
 
 
-@app.post("/login")
+@app.post('/login')
 def login_user(
-    response: Response, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
     db_user = crud.get_user_by_username(db=db, username=form_data.username)
     if not db_user:
@@ -55,19 +43,10 @@ def login_user(
         )
 
     if auth.verify_password(form_data.password, db_user.hashed_password):
-        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = auth.create_access_token(db_user)
-        # response = Response(status_code=status.HTTP_302_FOUND)
-        response.set_cookie(key="access_token",value=f"Bearer {access_token}", httponly=True)
         return {"access_token": access_token, "token_type": "bearer"}
-
     raise HTTPException(status_code=401, detail="Anmeldeinformationen nicht korrekt")
 
-
-@app.get("/logout")
-def logout(response: Response):
-    response.set_cookie(response, None)
-    return response
 
 
 @app.get("/verify/{token}", response_class=HTMLResponse)
@@ -98,12 +77,10 @@ def get_all_users(db: Session = Depends(get_db)):
     return users
 
 @app.get("/secured", dependencies=[Depends(auth.check_active)])
-def get_all_users(db: Session = Depends(get_db)):
+def get_current_user(db: Session = Depends(get_db)):
     users = crud.get_users(db=db)
     return users
 
-
-@app.get("/adminsonly", dependencies=[Depends(auth.check_admin)])
-def get_all_users(db: Session = Depends(get_db)):
-    users = crud.get_users(db=db)
-    return users
+@app.get("/adminsonly")
+def get_all_users_admin(db: Session = Depends(get_db), role=Depends(auth.check_admin)):
+    return role
