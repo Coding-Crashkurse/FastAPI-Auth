@@ -5,6 +5,7 @@ from typing import Union, Any
 
 from datetime import datetime, timedelta
 import os
+from . import crud
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 ALGORITHM = "HS256"
@@ -61,26 +62,36 @@ def verify_token(token):
         raise Exception("Wrong token")
 
 
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    payload = verify_token(token)
+    sub: str = payload.get("sub")
+    if not sub:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return sub
+
+
 def check_active(token: str = Depends(oauth2_scheme)):
     payload = verify_token(token)
-    active = payload.get("active")
+    active: bool = payload.get("active")
     if not active:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Please activate your Account first",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    else:
-        return payload
+    return payload
 
 
 def check_admin(payload: dict = Depends(check_active)):
-    role = payload.get("role")
-    if role != "admin":
+    role: str = payload.get("role")
+    if role != 'admin':
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admins can access this route",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    else:
-        return (f"User is: {role}")
+    return
