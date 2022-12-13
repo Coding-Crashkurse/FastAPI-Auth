@@ -12,14 +12,14 @@ class Roles(Enum):
 class UserBase(BaseModel):
     email: EmailStr
     username: str
-    is_active: bool = False
-    role: Roles = "user"
 
 class UserRegister(UserBase):
     password: str
 
 class UserDB(UserBase):
     id: str
+    role: Roles = "user"
+    is_active: bool = False
     hashed_password: str
     
     class Config:
@@ -35,4 +35,5 @@ class UserPlain(BaseModel):
 
 class Token(BaseModel):
     access_token: str
+    refresh_token: str
     token_type: str

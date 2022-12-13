@@ -3,12 +3,12 @@ import smtplib
 from email.message import EmailMessage
 from fastapi import requests
 
-email = os.getenv("email")
-password = os.getenv("password")
+EMAIL = os.getenv("EMAIL")
+PASSWORD = os.getenv("PASSWORD")
 API_KEY = os.getenv("MAILGUN_API_KEY")
 
 
-def send_mail(to, token, username, email=email, password=password):
+def send_mail(to, token, username, email=EMAIL, password=PASSWORD):
     msg = EmailMessage()
     msg.add_alternative(
         f"""\
