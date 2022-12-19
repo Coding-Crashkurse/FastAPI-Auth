@@ -1,5 +1,5 @@
 from fastapi import Depends, HTTPException, Security, status, Cookie
-from typing import Union, Any
+from typing import Union, Any, Optional
 
 from datetime import datetime, timedelta
 import os
@@ -9,6 +9,7 @@ from fastapi_jwt import (
     JwtAccessBearerCookie,
     JwtAuthorizationCredentials,
     JwtRefreshBearer,
+    JwtRefreshBearerCookie
 )
 
 SECRET_KEY = os.getenv('SECRET_KEY')
@@ -22,7 +23,7 @@ access_security = JwtAccessBearerCookie(
     access_expires_delta=timedelta(hours=1)  # change access token validation timedelta
 )
 # Read refresh token from bearer header only
-refresh_security = JwtRefreshBearer(
+refresh_security = JwtRefreshBearerCookie(
     secret_key=SECRET_KEY, 
     auto_error=True  # automatically raise HTTPException: HTTP_401_UNAUTHORIZED 
 )
@@ -56,7 +57,7 @@ def get_credentials_refresh(credentials: JwtAuthorizationCredentials = Security(
 def get_current_user(credentials: str = Depends(get_credentials)):
     if (username := credentials["username"]) is None:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid username"
         )
     return username
@@ -65,7 +66,7 @@ def get_current_user(credentials: str = Depends(get_credentials)):
 def check_active(credentials: str = Depends(get_credentials)):
     if credentials["is_active"] is not True:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Please activate your Account first"
         )
     return

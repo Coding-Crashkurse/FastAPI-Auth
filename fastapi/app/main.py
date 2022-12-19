@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 from fastapi import Depends, FastAPI, HTTPException, status, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.middleware.cors import CORSMiddleware
+
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
@@ -14,6 +16,16 @@ from .database import get_db, DBContext
 
 app = FastAPI()
 # app.mount("/static", StaticFiles(directory="static"), name="static")
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get('/', response_class=RedirectResponse, include_in_schema=False)
@@ -25,7 +37,7 @@ def docs():
 def register_user(user: schemas.UserRegister, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_username(db=db, username=user.username)
     if db_user:
-        raise HTTPException(status_code=400, detail="Email existiert bereits im System")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Email existiert bereits im System")
     db_user = crud.create_user(db=db, user=user)
     subject = {"username": db_user.username, "role": db_user.role.value}
     token = auth.access_security.create_access_token(subject=subject)
@@ -85,8 +97,6 @@ def login_user_with_cookies(
         # Create access/refresh cookies
         auth.access_security.set_access_cookie(response, access_token)
         auth.refresh_security.set_refresh_cookie(response, refresh_token)
-        # response.set_cookie(key="access_token_cookie",value=access_token, httponly=True)
-        # response.set_cookie(key="refresh_token_cookie",value=refresh_token, httponly=True)
         return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"} 
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Anmeldeinformationen nicht korrekt")
 
@@ -95,8 +105,6 @@ def login_user_with_cookies(
 def logout_unset_cookies(response: Response):
     auth.access_security.unset_access_cookie(response)
     auth.refresh_security.unset_refresh_cookie(response)
-    # response.delete_cookie("access_token_cookie")
-    # response.delete_cookie("refresh_token_cookie")
     return {"message": "logged out"}
 
 
@@ -109,8 +117,21 @@ def refresh(credentials = Depends(auth.get_credentials_refresh)):
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
 
+@app.post("/refresh_cookie", response_model=schemas.Token)
+def refresh_with_cookies(response: Response, credentials = Depends(auth.get_credentials_refresh)):
+    # Update access/refresh tokens pair
+    # We can customize expires_delta when creating
+    access_token = auth.access_security.create_access_token(subject=credentials.subject)
+    refresh_token = auth.refresh_security.create_refresh_token(subject=credentials.subject, expires_delta=timedelta(days=2))
+
+    # Create access/refresh cookies
+    auth.access_security.set_access_cookie(response, access_token)
+    auth.refresh_security.set_refresh_cookie(response, refresh_token)
+    return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
+
+
 @app.get("/verify/{token}", response_class=HTMLResponse)
-def login_user(token: str, db: Session = Depends(get_db)):
+def verify_user(token: str, db: Session = Depends(get_db)):
     credentials = auth.access_security._decode(token)
     if not credentials:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token ungültig") 
@@ -118,7 +139,7 @@ def login_user(token: str, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_username(db, credentials['subject']['username'])
 
     if db_user.is_active:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User bereits aktiviert")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User bereits aktiviert")
 
     db_user.is_active = True
     db.commit()
@@ -147,10 +168,10 @@ def get_all_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
     return users
 
 @app.get("/users/{user_id}", dependencies=[Depends(auth.check_active)], response_model=schemas.UserPlain)
-def read_user(user_id: str, db: Session = Depends(get_db)):
+def get_user_by_id(user_id: str, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, id=user_id)
     if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return db_user
 
 @app.get("/adminsonly", dependencies=[Depends(auth.check_admin)], response_model=List[schemas.UserDB])
