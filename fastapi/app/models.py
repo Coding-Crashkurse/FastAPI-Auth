@@ -12,4 +12,4 @@ class UserModel(Base):
     username = Column(String, unique=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=False)
-    role = Column(Enum(Roles))
+    role = Column(Enum(Roles), default=Roles.user.value)

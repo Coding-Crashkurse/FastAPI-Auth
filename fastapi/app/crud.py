@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 from . import auth, models, schemas
 import uuid
-from fastapi import Depends
 
 def get_user(db: Session, id: str):
     return db.query(models.UserModel).filter(models.UserModel.id == id).first()
@@ -29,8 +28,6 @@ def create_user(db: Session, user: schemas.UserRegister):
         email=user.email,
         username=user.username,
         hashed_password=hashed_password,
-        is_active=user.is_active,
-        role=user.role.value,
     )
     db.add(db_user)
     db.commit()
