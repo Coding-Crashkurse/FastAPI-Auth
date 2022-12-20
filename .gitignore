@@ -20,6 +20,7 @@ venv
 venv3
 mypy.ini
 .idea
+setup.cfg
 
 
 /.VSCodeCounter

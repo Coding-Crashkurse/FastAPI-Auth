@@ -5,7 +5,7 @@ import os
 
 SQLALCHEMY_DATABASE_URL = os.environ.get("SQLALCHEMY_DATABASE_URL")
 
-engine = create_engine("postgresql://admin:test@localhost:5432/fast_api_test")
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 def get_db():
     with DBContext() as db:

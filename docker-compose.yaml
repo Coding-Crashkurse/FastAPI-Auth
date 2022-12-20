@@ -1,28 +1,32 @@
-version: "3.8"
+version: '3.8'
 
 services:
-  database:
-    image: postgres:14.1-alpine
-    expose:
-      - "5432"
-    environment:
-      - POSTGRES_USER=test
-      - POSTGRES_PASSWORD=test
-      - POSTGRES_DB=db
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
 
   fastapi:
     build: ./fastapi
+    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
     ports:
-      - "5000:5000"
+      - 8000:8000
     environment:
-      - DATABASE_URL=postgresql://test:test@database/db
-      - EMAIL=test
-      - PASSWORD=test
+      - EMAIL=postmaster@sandboxf9238eb2a4d644789ba080fd0bcaa64e.mailgun.org
+      - PASSWORD=8859c171119068a1642751414dce8b4e-31eedc68-6709daef
+      - SQLALCHEMY_DATABASE_URL=postgresql://test:test@db/fastapi-boilerplate
+      - SECRET_KEY=1a30c4915edcc7136a258172641950fe0a7bed774a83418a
+      - MAILGUN_API_KEY=b128131fa8e7367d074ceca7e888d304-ba042922-6e7a30f5
     depends_on:
-      - database
+      - db
     restart: always
+
+  db:
+    image: postgres:14.1-alpine
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=fastapi-boilerplate
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
 
 volumes:
   postgres_data:
